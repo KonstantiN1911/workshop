@@ -1,4 +1,7 @@
+import java.math.BigDecimal;
 import java.util.Arrays;
+
+import static java.math.BigDecimal.*;
 
 public class Matrices {
     static <T> T todo() {
@@ -59,10 +62,11 @@ public class Matrices {
             if (other.items.length != this.items.length) {
                 throw new IllegalArgumentException();
             }
+            Vector result = new Vector(this.items.length);
             for (int i = 0; i < this.items.length; i++) {
-                this.items[i] -= other.items[i];
+                result.items[i] -= other.items[i];
             }
-            return this;
+            return result;
         }
 
         /**
@@ -79,7 +83,7 @@ public class Matrices {
 
             int result = 0;
             for (int i = 0; i < this.items.length; i++) {
-                result += other.items[i] + this.items[i];
+                result += other.items[i] * this.items[i];
             }
 
             return result;
@@ -92,9 +96,9 @@ public class Matrices {
          * @return новый вектор, представляющий результат умножения данного вектора на скаляр
          */
         public Vector scalarMultiply(int scalar) {
-            Vector vector = new Vector(this.items);
+            Vector vector = new Vector(this.items.length);
             for (int i = 0; i < items.length; i++) {
-                vector.items[i] = items[i] * scalar;
+                vector.items[i] = this.items[i] * scalar;
             }
             return vector;
         }
@@ -104,7 +108,11 @@ public class Matrices {
          * Вычисляет длину (норму) данного вектора.
          */
         public double length() {
-            return items.length;
+            double result = 0.0;
+            for (int i = 0; i < items.length ; i++) {
+                result += Math.pow(items[i], 2);
+            }
+            return Math.sqrt(result);
         }
 
 
@@ -212,17 +220,21 @@ public class Matrices {
          * @return новая матрица, являющаяся результатом умножения
          */
         public Matrix multiply(Matrix other) {
-            Matrix matrix = new Matrix(nCols, nCols);
-            for (int i = 0; i < nRows; i++) {
-                for (int j = 0; j < nCols; j++) {
-                    int sum = 0;
-                    for (int k = 0; k < nCols; k++) {
-                        sum += rows[i][k] * other.nCols;
+            if (this.nCols != other.nRows) {
+                throw new IllegalArgumentException();
+            }
+
+            Matrix result = new Matrix(this.nRows, other.nCols);
+
+            for (int i = 0; i < this.nRows; i++) {
+                for (int j = 0; j < other.nCols; j++) {
+                    for (int k = 0; k < this.nCols; k++) {
+                        result.rows[i][j] += this.rows[i][k] * other.rows[k][j];
                     }
-                    matrix.rows[i][j] = sum;
                 }
             }
-            return matrix;
+
+            return result;
         }
 
 
